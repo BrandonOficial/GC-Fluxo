@@ -23,8 +23,9 @@ import SendEmailNode from './nodes/SendEmailNode';
 import Toolbar from './Toolbar';
 import FlowBoards from './FlowBoards';
 import Navbar from './ui/Navbar';
-import { Edit, Save } from 'lucide-react';
+import { Edit, Save, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import WhatsAppNodeProperties from './properties/WhatsAppNodeProperties';
 
 const nodeTypes = {
   whatsapp: WhatsAppNode,
@@ -66,6 +67,8 @@ function FlowEditorContent({ flowId }: FlowEditorProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges || []);
   const reactFlowInstance = useReactFlow();
   const { getNode, project } = reactFlowInstance;
+
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
   // Carregar o fluxo apenas uma vez
   useEffect(() => {
@@ -184,6 +187,14 @@ function FlowEditorContent({ flowId }: FlowEditorProps) {
     [project, addNode]
   );
 
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    // Abrir painel de propriedades do nó
+    if (node.type === 'whatsapp') {
+      // Implementar lógica para mostrar WhatsAppNodeProperties
+      setSelectedNode(node);
+    }
+  }, []);
+
   // Atualizar o título com o status
   useEffect(() => {
     document.title = `${flowName}${hasUnsavedChanges ? ' *' : ''}`;
@@ -221,7 +232,7 @@ function FlowEditorContent({ flowId }: FlowEditorProps) {
         <div className="w-80 border-r border-border">
           <FlowBoards onBoardDrop={handleBoardDrop} />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <div 
             className="h-full"
             onDragOver={onDragOver}
@@ -236,6 +247,7 @@ function FlowEditorContent({ flowId }: FlowEditorProps) {
               onNodeDragStop={onNodeDragStop}
               onNodesDelete={(nodes) => nodes.forEach(onNodeDelete)}
               onEdgesDelete={(edges) => edges.forEach(onEdgeDelete)}
+              onNodeClick={handleNodeClick}
               nodeTypes={nodeTypes}
               fitView
             >
@@ -245,6 +257,26 @@ function FlowEditorContent({ flowId }: FlowEditorProps) {
               <Toolbar />
             </ReactFlow>
           </div>
+          
+          {/* Painel de Propriedades */}
+          {selectedNode && selectedNode.type === 'whatsapp' && (
+            <div className="absolute top-0 right-0 w-80 h-full bg-white border-l border-border overflow-y-auto shadow-lg">
+              <div className="sticky top-0 bg-white border-b border-border p-4 flex justify-between items-center">
+                <h3 className="font-semibold text-gray-900">Configurações do WhatsApp</h3>
+                <button
+                  onClick={() => setSelectedNode(null)}
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Fechar"
+                >
+                  <X size={18} className="text-gray-500" />
+                </button>
+              </div>
+              <WhatsAppNodeProperties
+                nodeId={selectedNode.id}
+                data={selectedNode.data}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

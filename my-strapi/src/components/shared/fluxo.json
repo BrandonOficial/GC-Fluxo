@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_fluxos",
+  "info": {
+    "displayName": "fluxo",
+    "icon": "oneToOne"
+  },
+  "options": {},
+  "attributes": {
+    "dataFluxo": {
+      "type": "json"
+    }
+  }
+}

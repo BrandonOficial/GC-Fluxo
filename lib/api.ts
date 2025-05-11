@@ -43,6 +43,8 @@ interface WhatsAppMessage {
   to: string;
   message: string;
   flowId?: string;
+  from?: string;
+  webhookUrl?: string;
 }
 
 // URL base da API
